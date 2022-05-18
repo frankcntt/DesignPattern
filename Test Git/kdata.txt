@@ -1,8 +1,6 @@
 12231
 tôi đã edit file này ở nhánh master
 tôi đã edit file này ở nhánh master
-<<<<<<< HEAD
 tôi đã edit file này ở nhánh master
-=======
 tôi đã edit file này ở nhánh master
->>>>>>> demo/dev-1
+
