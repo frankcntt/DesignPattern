@@ -1,0 +1,305 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Models.ApplicationUser>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var roles = (IEnumerable<TBSLogistics.WebApp.Models.AspNetRole>)ViewBag.Roles;
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">User</h6>
+        <a href="#" class="btn btn-sm btn-info btn-rounded btn-fw" id="add-user-modal" data-toggle="modal" data-target="#AddUserModel">
+            <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+        </a>
+        <hr />
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            UserName
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            PasswordHash
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="py-1">
+                                @user.Id
+                            </td>
+                            <td>
+                                @user.UserName
+                            </td>
+                            <td>
+                                @user.Email
+                            </td>
+                            <td>
+                                @user.PasswordHash
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-success btn-rounded reset-password" id="@user.Id">
+                                    Reset Password
+                                </a>
+                                <a href="#" class="btn btn-sm btn-primary btn-rounded update-user" id="@user.Id">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddUserModel" role="dialog" aria-labelledby="AddUserModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">New User: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="user">
+                    <div class="form-group">
+                        <input type="email" class="form-control form-control-user" id="Email" name="Email" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control form-control-user" id="Password" name="Password" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control form-control-user" id="ConfirmPassword" name="ConfirmPassword" placeholder="ConfirmPassword">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="PhoneNumber" name="PhoneNumber" placeholder="PhoneNumber">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="Address" name="Address" placeholder="Address">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control form-control w-25" id="Role">
+                            <option value="" selected>--Select--</option>
+                            @foreach (var item in roles)
+                            {
+                                <option value="@item.Name">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-user btn-block" id="add-user">
+                        Add
+                    </a>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="UpdateUserModel" role="dialog" aria-labelledby="UpdateUserModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Update User: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-update-user">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ResetPasswordModel" role="dialog" aria-labelledby="ResetPasswordModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Reset Password: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-reset-password">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $("body").on("click", ".update-user", function (e) {
+                e.preventDefault();
+                var userID = $(this).attr("id");
+                $.get("/Admin/User/Edit?id=" + userID, function (data) {
+                    $("#body-update-user").html(data);
+                    $("#UpdateUserModel").modal('show');
+                });
+            });
+            $("body").on("click", ".reset-password", function (e) {
+                e.preventDefault();
+                var userID = $(this).attr("id");
+                $.get("/Admin/User/GetUserToResetPass?id=" + userID, function (data) {
+                    $("#body-update-user").html(data);
+                    $("#UpdateUserModel").modal('show');
+                });
+            });
+            $("body").on("click", "#reset-password-user", function (e) {
+                e.preventDefault();
+                var email = $("#rEmail").val();
+                var password = $("#rPassword").val();
+                var confirmPassword = $("#rConfirmPassword").val();
+                if (jQuery.trim(email).length < 1) {
+                    toastr.error("The Name is empty.Please check again!");
+                    return;
+                }
+                if (jQuery.trim(confirmPassword).length < 1) {
+                    toastr.error("The confirmPassword is empty.Please check again!");
+                    return;
+                }
+                if (jQuery.trim(password).length < 1) {
+                    toastr.error("The password is empty.Please check again!");
+                    return;
+                }
+               
+                var model = {
+                    Email: email,
+                    Password: password,
+                    ConfirmPassword: confirmPassword
+                }
+                $.ajax({
+                    url: '/Admin/User/ResetPassword',
+                    data: JSON.stringify({
+                        model
+                    }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (result) {
+                        if (result.success) {
+                            toastr.success(result.message);
+                            setTimeout(function () { location.reload(); }, 1000);
+                        } else {
+                            toastr.error(result.message);
+                        }
+                    },
+                    error: function (xhr, status) {
+                        toastr.error(status);
+                    }
+                });
+            });
+            // submit add User
+            $("body").on("click", "#add-user", function (e) {
+                e.preventDefault();
+                var email = $("#Email").val();
+                var password = $("#Password").val();
+                var confirmPassword = $("#ConfirmPassword").val();
+                var phoneNumber = $("#PhoneNumber").val();
+                var address = $("#Address").val();
+                var role = $('#Role').val();
+                if (jQuery.trim(email).length < 1) {
+                    toastr.error("The Name is empty.Please check again!");
+                    return;
+                }
+                if (jQuery.trim(confirmPassword).length < 1) {
+                    toastr.error("The confirmPassword is empty.Please check again!");
+                    return;
+                }
+                if (jQuery.trim(password).length < 1) {
+                    toastr.error("The password is empty.Please check again!");
+                    return;
+                }
+                if (jQuery.trim(role).length < 1) {
+                    toastr.error("The Role is not selected.Please check again!");
+                    return;
+                }
+                var model = {
+                    Email: email,
+                    Password: password,
+                    ConfirmPassword: confirmPassword,
+                    PhoneNumber: phoneNumber,
+                    Address: address,
+                    Role: role
+                }
+                $.ajax({
+                    url: '/Admin/User/Add',
+                    data: JSON.stringify({
+                        model
+                    }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (result) {
+                        if (result.success) {
+                            toastr.success(result.message);
+                            setTimeout(function () { location.reload(); }, 1000);
+                        } else {
+                            toastr.error(result.message);
+                        }
+                    },
+                    error: function (xhr, status) {
+                        toastr.error(status);
+                    }
+                });
+            });
+            $("body").on("click", "#save-user", function (e) {
+                e.preventDefault();
+                var email = $("#uEmail").val();
+             
+                var phoneNumber = $("#uPhoneNumber").val();
+                var address = $("#uAddress").val();
+                var role = $('#uRole').val();
+                console.log(role);
+                if (jQuery.trim(role).length < 1) {
+                    toastr.error("The Role is not selected.Please check again!");
+                    return;
+                }
+          
+                var model = {
+                    Email: email,
+                    PhoneNumber: phoneNumber,
+                    Address: address,
+                    Role: role
+                }
+                $.ajax({
+                    url: '/Admin/User/Update',
+                    data: JSON.stringify({
+                        model
+                    }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (result) {
+                        if (result.success) {
+                            toastr.success(result.message);
+                            setTimeout(function () { location.reload(); }, 1000);
+                        } else {
+                            toastr.error(result.message);
+                        }
+                    },
+                    error: function (xhr, status) {
+                        toastr.error(status);
+                    }
+                });
+            });
+        });
+    </script>
+}

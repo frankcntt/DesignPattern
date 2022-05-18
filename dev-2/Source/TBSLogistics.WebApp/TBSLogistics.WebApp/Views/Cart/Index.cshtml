@@ -1,0 +1,150 @@
+﻿@model TBSLogistics.WebApp.DTO.CartViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cartItems = Model.CartItems;
+}
+<div class="cart-table-area section-padding-100">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-9">
+                <div class="cart-title mt-50">
+                    <h2>Giỏ Hàng</h2>
+                </div>
+
+                <div class="cart-table clearfix">
+                    <table class="table table-responsive">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in cartItems)
+                            {
+                                <tr>
+                                    <td class="cart_product_img">
+                                        <a href="/Product/?productID=@item.Product.ID"><img src="@item.Product.Image" alt="Product"></a>
+                                    </td>
+                                    <td class="cart_product_desc">
+                                        <a href="/Product/?productID=@item.Product.ID" class="text-primary">
+                                            <h6 class="text-primary">@item.Product.Name</h6>
+                                        </a>
+
+                                    </td>
+                                    <td class="price">
+                                        <span>@String.Format("{0:n}₫", item.Product.Price)</span>
+                                    </td>
+                                    <td class="qty">
+                                        <div class="qty-btn d-flex">
+                                            <p>Qty</p>
+                                            <div class="quantity">
+                                                <span class="qty-minus"
+                                            id="qty-minus-@item.Product.ID"
+                                            onclick="var effect = document.getElementById('qty-@item.Product.ID'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i class="fa fa-minus" aria-hidden="true"></i></span>
+                                            <input type="number"
+                                            class="cls-qty-@item.Product.ID"
+                                            id="qty-@item.Product.ID" step="1" min="1" max="@item.Product.Inventory" name="quantity" value="@item.Qty">
+                                            <span class="qty-plus"
+                                            id="qty-plus-@item.Product.ID"
+                                            onclick="var effect = document.getElementById('qty-@item.Product.ID'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                            </div>
+                                            <a href="#" class="text-danger btn btn-sm remove-cart" id="@item.Product.ID"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-12 col-lg-3">
+                <div class="cart-summary">
+                    <h5>Total</h5>
+                    <ul class="summary-table">
+                        <li><span>Total Qty:</span> <span>@String.Format("{0:n0}", Model.TotalQty)</span></li>
+                        <li><span>total Price:</span> <span>@String.Format("{0:n}₫", Model.TotalPrice)</span></li>
+                    </ul>
+                    <div class="cart-btn mt-100">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a href="/Order/Checkout?cartID=@Model.CartID" class="btn amado-btn w-100" id="checkout">Thanh toán</a>
+                        }
+                        else
+                        {
+                            <a href="/Account/Login" class="btn amado-btn w-100" id="checkout">Login to checkout</a>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <!--TreeJs JS-->
+    <script type="text/javascript">
+        $(function () {
+            $("body").on("click", ".qty-plus", function (e) {
+                e.preventDefault();
+                var id = $(this).attr("id").split("-").pop();
+                var qty = $(document.getElementsByClassName('cls-qty-' + id)).val();
+                $.ajax({
+                    type: "POST",
+                    url: '/Cart/UpdateQty',
+                    data: JSON.stringify({
+                        id: id,
+                        qty: qty
+                    }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.reload();
+                    },
+                });
+            });
+            $("body").on("click", ".qty-minus", function (e) {
+                e.preventDefault();
+                var id = $(this).attr("id").split("-").pop();
+                var qty = $(document.getElementsByClassName('cls-qty-' + id)).val();
+                $.ajax({
+                    type: "POST",
+                    url: '/Cart/UpdateQty',
+                    data: JSON.stringify({
+                        id: id,
+                        qty: qty
+                    }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.reload();
+                    },
+                });
+            });
+            $("body").on("click", ".remove-cart", function (e) {
+                e.preventDefault();
+                var Id = $(this).attr("id");
+                $.ajax({
+                    type: "POST",
+                    url: '/Cart/Remove',
+                    data: JSON.stringify({ id: Id }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.reload();
+                    },
+                });
+            });
+
+            function currencyFormat(num) {
+                return num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') + "₫"
+            }
+        })
+    </script>
+}

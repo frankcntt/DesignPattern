@@ -1,0 +1,12 @@
+﻿@{ 
+    int orderID = (int)ViewBag.OrderID;
+}
+<form>
+    <div class="form-group">
+        <textarea class="form-control form-control-sm" cols="3" id="cancel-reason"></textarea>
+        <input value="@orderID" id="orderID" hidden>
+    </div>
+    <div class="form-group m-2">
+        <a href="#" id="cancel-order" class="btn btn-danger w-100">Hủy</a>
+    </div>
+</form>

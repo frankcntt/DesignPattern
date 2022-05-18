@@ -1,0 +1,403 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Models.Tbs_Product>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<!--TreeJs CSS-->
+<link href="~/Areas/Admin/Statics/css/Jstree/style.min.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-lg-3">
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Tree Category</h6>
+            </div>
+            <div class="card-body">
+                <div id="jtreeCategory">
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Brand Buttons -->
+
+
+    </div>
+
+    <div class="col-lg-9">
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">List's Product</h6>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title"></h4>
+                <a href="#" class="btn btn-sm btn-info btn-rounded btn-fw" id="add-product-modal">
+                    <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                </a>
+                <hr />
+                <div class="card shadow mb-4">
+                    <div class="card-body" id="tbProductContent">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="AddProductModel" role="dialog" aria-labelledby="AddProductModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">New Product: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="user" enctype="multipart/form-data" id="Submitf" name="Submitf">
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="category" readonly />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="aName" name="Name"
+                               placeholder="Product Name">
+                    </div>
+                    <div class="form-group">
+                        <textarea type="text" class="form-control" id="aDesc" name="Description" placeholder="Product description"></textarea>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-4 mb-3 mb-sm-0">
+                            <input type="number" class="form-control form-control-user"  name="Price" id="aPrice" placeholder="Price">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control form-control-user" name="SKU" id="aSKU" placeholder="SKU">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control form-control-user" name="Inventory"  id="aInventory" placeholder="Inventory">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="aImage">
+                            <label class="custom-file-label" for="aImage">Choose file...</label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <div class="custom-control custom-checkbox small">
+                                <input type="checkbox" class="custom-control-input" id="aIsFreeShip" name="File">
+                                <label class="custom-control-label" for="aIsFreeShip">
+                                    IsFreeShip
+                                </label>
+                            </div>
+                            
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="number" class="form-control form-control-user" id="aVAT" name="VAT" placeholder="VAT">
+                        </div>
+                       
+                    </div>
+
+                    <a href="#" class="btn btn-primary btn-user btn-block" id="add-product">
+                        Save
+                    </a>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="UpdateProductModel" role="dialog" aria-labelledby="UpdateProductModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Update Product: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-update-product">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="DetailProductModel" role="dialog" aria-labelledby="DetailProductModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Detail Product: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-detail-product">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@Html.Partial("_ZoomImage");
+<input type="number" id="SelectCategoryID" hidden />
+@section Scripts{
+    <!--TreeJs JS-->
+    <script src="~/Areas/Admin/Statics/js/jstree.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+            LoadTreeCategory();
+            function LoadTreeCategory() {
+                $.get("/Admin/Category/CategoryTree", function (data) {
+                    console.log(data);
+                    $('#jtreeCategory').jstree({
+                        'core': {
+                            'data': data
+                        },
+                        "themes": {
+                            "theme": "default",
+                            "dots": false,
+                            "icons": false
+                        },
+                    });
+                });
+                function LoadProductByCategory(id) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Admin/Product/GetProductTable',
+                        data: { categoryId: id },
+                        dataType: "html",
+                        async: true,
+                        cache: true,
+                        success: function (data) {
+                            $("#tbProductContent").html(data);
+                        },
+
+                    });
+                }
+                $('#jtreeCategory').on('changed.jstree', function (e, data) {
+                    var i, j;
+                    ids = [];
+                    for (i = 0, j = data.selected.length; i < j; i++) {
+                        var id = data.selected[i];
+                        ids.push(id);
+                    }
+                    $("#SelectCategoryID").val(ids[0]);
+                    LoadProductByCategory(ids[0])
+                }).bind("loaded.jstree", function (event, data) {
+                    $(this).jstree("open_all");
+                });
+
+                // Add Parent Category
+
+                // Show model to add Product
+                $("body").on("click", "#add-product-modal", function (e) {
+                    e.preventDefault();
+                    var categoryId = $("#SelectCategoryID").val();
+                    if (jQuery.trim(categoryId).length < 1) {
+                        toastr.error("Please select the category in the left side first");
+                        return;
+                    }
+                    $.get("/Admin/Category/GetCategory?id=" + categoryId, function (data) {
+                        $("#category").val(data.Name);
+                        $("#AddProductModel").modal('show');
+                    });
+                });
+                //save new product
+                $("body").on("click", "#add-product", function (e) {
+                    e.preventDefault();
+                    var data = {
+                        Name: $("#aName").val(),
+                        Description: $("#aDesc").val(),
+                        Price: parseFloat($("#aPrice").val()),
+                        SKU: $("#aSKU").val(),
+                        Inventory: parseInt($("#aInventory").val()),
+                        IsFreeShip: $("#aIsFreeShip").is(":checked"),
+                        VAT: parseInt($("#aVAT").val()),
+                        CategoryID: parseInt($("#SelectCategoryID").val())
+                    };
+                    
+                    if (jQuery.trim(data.Name).length < 1) {
+                        toastr.error("The Name is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    if (jQuery.trim(data.Price).length < 1) {
+                        toastr.error("The Price is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    if (jQuery.trim(data.Inventory).length < 1) {
+                        toastr.error("The Inventory is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    var fileData = new FormData();
+                    fileData.append("Name", data.Name);
+                    fileData.append("Description", data.Description);
+                    fileData.append("Price", data.Price);
+                    fileData.append("SKU", data.SKU);
+                    fileData.append("Inventory", data.Inventory);
+                    fileData.append("IsFreeShip", data.IsFreeShip);
+                    fileData.append("VAT", data.VAT);
+                    fileData.append("CategoryID", data.CategoryID);
+                    fileData.append("File", $('#aImage')[0].files[0]);
+                    $.ajax({
+                        url: '/Admin/Product/Add',
+                        data: fileData,
+                        type: 'POST',
+                        contentType: false,
+                        processData: false,
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                LoadProductByCategory($("#SelectCategoryID").val())
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                });
+
+                // Show Detail Product
+                $("body").on("click", ".detail-product-modal", function (e) {
+                    e.preventDefault();
+                    var id = $(this).attr("id");
+                    $.get("/Admin/Product/Detail?id=" + id, function (data) {
+                        $("#body-detail-product").html(data);
+                        $("#DetailProductModel").modal('show');
+                    });
+                });
+
+                // Show model to update product modal
+                $("body").on("click", ".update-product-modal", function (e) {
+                    e.preventDefault();
+                    e.preventDefault();
+                    var id = $(this).attr("id");
+                    $.get("/Admin/Product/Update?id=" + id, function (data) {
+                        $("#body-update-product").html(data);
+                        $("#UpdateProductModel").modal('show');
+                    }).done(function () {
+                        $(".custom-file-input").on("change", function () {
+                            var fileName = $(this).val().split("\\").pop();
+                            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+                        });
+                    });
+                        
+                });
+
+                 //submiit Update Product
+                $("body").on("click", "#update-product", function (e) {
+                    e.preventDefault();
+                    var data = {
+                        ID: $("#productID").val(),
+                        Name: $("#uName").val(),
+                        Description: $("#uDesc").val(),
+                        Price: parseFloat($("#uPrice").val()),
+                        SKU: $("#uSKU").val(),
+                        Inventory: parseInt($("#uInventory").val()),
+                        IsFreeShip: $("#uIsFreeShip").is(":checked"),
+                        IsActve: $("#uIsActve").is(":checked"),
+                        VAT: parseInt($("#uVAT").val())
+                    };
+                    if (jQuery.trim(data.ID).length < 1) {
+                        toastr.error("The an error occurred while updating.Please refresh page!");
+                        return;
+                    }
+                    if (jQuery.trim(data.Name).length < 1) {
+                        toastr.error("The Name is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    if (jQuery.trim(data.Price).length < 1) {
+                        toastr.error("The Price is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    if (jQuery.trim(data.Inventory).length < 1) {
+                        toastr.error("The Inventory is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    var fileData = new FormData();
+                    fileData.append("ID", data.ID);
+                    fileData.append("Name", data.Name);
+                    fileData.append("Description", data.Description);
+                    fileData.append("Price", data.Price);
+                    fileData.append("SKU", data.SKU);
+                    fileData.append("Inventory", data.Inventory);
+                    fileData.append("IsFreeShip", data.IsFreeShip);
+                    fileData.append("VAT", data.VAT);
+                    fileData.append("IsActve", data.IsActve);
+                    fileData.append("File", $('#uImage')[0].files[0]);
+                    $.ajax({
+                        url: '/Admin/Product/Update',
+                        data: fileData,
+                        type: 'POST',
+                        contentType: false,
+                        processData: false,
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                LoadProductByCategory($("#SelectCategoryID").val())
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                })
+
+                // Delete category
+                $("body").on("click", ".delete-product", function (e) {
+                    e.preventDefault();
+                    if (confirm("Press OK to delete") == false) {
+                        return;
+                    }
+                    var Id = $(this).attr("id");
+                    if (jQuery.trim(Id).length < 1) {
+                        toastr.error("The system cannot get Parent Category.Please check again!");
+                        return;
+                    }
+                    $.ajax({
+                        url: '/Admin/Product/Delete',
+                        data: JSON.stringify({
+                            Id: Id
+                        }),
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                LoadProductByCategory($("#SelectCategoryID").val());
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                })
+
+            }
+
+        })
+    </script>
+}

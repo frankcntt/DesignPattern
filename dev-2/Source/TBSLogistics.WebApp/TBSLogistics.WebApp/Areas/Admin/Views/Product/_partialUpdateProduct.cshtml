@@ -1,0 +1,84 @@
+﻿@model TBSLogistics.WebApp.Models.Tbs_Product
+<form class="user" enctype="multipart/form-data" id="Submitf" name="Submitf">
+    <div class="form-group">
+        <label class="label-primary font-weight-bold" for="uName">Name:</label>
+        <input type="text" class="form-control form-control-user" id="uName" value="@Model.Name" name="Name"
+               placeholder="Product Name">
+    </div>
+    <div class="form-group">
+        <label class="label-primary font-weight-bold" for="uDesc">Description:</label>
+        <textarea type="text" class="form-control" id="uDesc" name="Description" value="@Model.Description" placeholder="Product description">@Model.Description</textarea>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-4 mb-3 mb-sm-0">
+            <label class="label-primary font-weight-bold" for="uPrice">Price:</label>
+            <input type="number" class="form-control form-control-user" name="Price" value="@Model.Price" id="uPrice" placeholder="Price">
+        </div>
+        <div class="col-sm-4">
+            <label class="label-primary font-weight-bold" for="SKU">SKU:</label>
+            <input type="text" class="form-control form-control-user" name="SKU" value="@Model.SKU" id="uSKU" placeholder="SKU">
+        </div>
+        <div class="col-sm-4">
+            <label class="label-primary font-weight-bold" for="uInventory">Inventory:</label>
+            <input type="number" class="form-control form-control-user" name="Inventory" value="@Model.Inventory" id="uInventory" placeholder="Inventory">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-7 mb-3 mb-sm-0">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="uImage">
+                <label class="custom-file-label" for="uImage">Choose file...</label>
+                <label class="label-primary font-weight-bold" for="uVAT">VAT:</label>
+                <input type="number" class="form-control form-control-user" id="uVAT" name="VAT" value="@Model.VAT" placeholder="VAT">
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <img src="@Model.Image" width="40%" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-4 mb-3 mb-sm-0">
+            <div class="custom-control custom-checkbox small">
+                @if (Model.IsFreeShip == true)
+                {
+
+
+                    <input type="checkbox" class="custom-control-input" id="uIsFreeShip" name="IsFreeShip" checked>
+                }
+                else
+                {
+                    <input type="checkbox" class="custom-control-input" id="uIsFreeShip" name="IsFreeShip">
+                }
+
+                <label class="custom-control-label" for="uIsFreeShip">
+                    IsFreeShip
+                </label>
+            </div>
+
+        </div>
+        <div class="col-sm-4">
+            <div class="custom-control custom-checkbox small">
+                @if (Model.IsActve == true)
+                {
+
+
+                    <input type="checkbox" class="custom-control-input" id="uIsActve" name="IsActve" checked>
+                }
+                else
+                {
+                    <input type="checkbox" class="custom-control-input" id="uIsActve" name="IsActve">
+                }
+
+            <label class="custom-control-label" for="uIsActve">
+                IsActve
+            </label>
+            </div>
+
+        </div>
+
+    </div>
+    <input type="number" value="@Model.ID" id="productID" hidden />
+    <a href="#" class="btn btn-primary btn-user btn-block" id="update-product">
+        Update
+    </a>
+</form>
