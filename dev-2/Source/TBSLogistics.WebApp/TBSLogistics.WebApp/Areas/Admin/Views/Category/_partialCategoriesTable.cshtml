@@ -1,0 +1,89 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Models.Tbs_Category>
+
+<div class="table-responsive">
+    <table class="table table-condensed" id="dataTable" width="100%" cellspacing="0" style="font-size:14px !important">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Desc
+                </th>
+                <th>
+                    Image
+                </th>
+                <th>
+                    Createby
+                </th>
+                <th>
+                    CreateDate
+                </th>
+                <th>
+                    IsActive
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var cate in Model)
+            {
+                var bg_color = string.Empty;
+                var text_align = "text-right";
+                if(cate.ParentID == null)
+                {
+                    bg_color = "bg-gradient-dark text-white";
+                    text_align = "text-left";
+                }
+            <tr class="@bg_color @text_align">
+                <td>
+                    @cate.Name
+                </td>
+                <td>
+                    @cate.Description
+                </td>
+                <td>
+                    <a href="#" class="pop">
+                        <img src="@cate.Image" width="50%"/>
+                    </a>
+                  
+                </td>
+                <td>
+                    @cate.CreateBy
+                </td>
+                <td>
+                    @cate.CreateDate
+                </td>
+                <td class="text-md-center">
+                    @if (cate.IsActive == true)
+                    {
+                        <span class="text-success"><i class="fa fa-eye" aria-hidden="true"></i></span>
+                    }
+                    else
+                    {
+                        <span class="text-danger"><i class="fa fa-eye-slash" aria-hidden="true"></i></span>
+                    }
+                </td>
+                <td class="text-md-center">
+                    @if (cate.ParentID == null && cate.IsActive == true)
+                    {
+                        <a href="#" class="btn btn-sm btn-primary btn-rounded add-subcategory" title="Add SubCategory" id="@cate.ID">
+                            <i class="fa fa-location-arrow" aria-hidden="true"></i>
+                        </a>
+                    }
+                    <a href="#" class="btn btn-sm btn-secondary btn-rounded update-category" title="Update Category" id="@cate.ID">
+                        <i class="fa fa-wrench" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-danger btn-rounded delete-category" title="Delete Category" id="@cate.ID">
+                        <i class="fa fa-ban" aria-hidden="true"></i>
+                    </a>
+
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

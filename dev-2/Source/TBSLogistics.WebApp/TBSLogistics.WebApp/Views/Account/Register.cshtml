@@ -1,0 +1,56 @@
+﻿@model TBSLogistics.WebApp.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+}
+
+<div class="cart-table-area section-padding-100">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <div class="checkout_details_area mt-50 clearfix">
+
+                    <div class="cart-title">
+                        <h2>Đăng ký</h2>
+                    </div>
+                    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-12 p-1">
+
+                        @Html.ValidationSummary("", new { @class = "text-danger" })
+                    </div>
+                    <hr />
+                    <div class="col-md-6 mb-3">
+                        <input type="email" class="form-control" name="Email" id="Email" value="" placeholder="Email" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <input type="text" class="form-control" name="PhoneNumber" id="PhoneNumber" placeholder="Phone" value="">
+
+                    </div>
+                    <div class="col-12 mb-3">
+                        <input type="password" class="form-control" name="Password" id="Password" value="" placeholder="Password" required>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <input type="password" class="form-control" name="ConfirmPassword" id="ConfirmPassword" value="" placeholder="ConfirmPassword" required>
+                    </div>
+
+
+                    <div class="col-12 mb-3">
+                        <input type="text" class="form-control mb-3" name="Address" id="Address" placeholder="Address" value="">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" name="addtocart" value="5" class="btn amado-btn add-to-cart">Đăng ký</button>
+
+                    </div>
+                </div>
+                    }
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+

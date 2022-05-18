@@ -1,0 +1,159 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.DTO.OrderItem>
+@{
+    ViewBag.Title = "Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var index = 1;
+}
+<div class="cart-table-area section-padding-10">
+    <div class="container-fluid">
+        <div class="row">
+            @foreach (var order in Model.OrderByDescending(x => x.OrderDate))
+            {
+                <div class="col-12 col-lg-8">
+                    <div class="cart-title mt-50">
+                        <h5 style="font-size:18px !important" class="text-secondary">Đơn hàng - @order.OrderDate [@order.OrderID] </h5>
+                    </div>
+                    <div class="cart-table clearfix">
+
+                        <table class="table table-responsive">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>Số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in order.OrderProducts)
+                                {
+                                    <tr>
+                                        <td class="cart_product_img">
+                                            <a href="/Product/?productID=@item.ID"><img src="@item.Image" alt="Product"></a>
+                                        </td>
+                                        <td class="cart_product_desc pt-5">
+                                            <a href="/Product/?productID=@item.ID" class="text-primary">
+                                                <h6 class="text-secondary">@item.Name</h6>
+                                            </a>
+                                            <span>@String.Format("{0:n}₫", item.Price)</span>
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            ( <span class="font-weight-bold">@String.Format("{0:n0}", item.Qty)</span> )
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="cart-summary">
+                        <h5>Cart Total</h5>
+                        <ul class="summary-table text-primary">
+                            <li><span>Total Qty:</span><span>@String.Format("{0:n0}", order.TotalQty)</span></li>
+                            <li><span>Total Price:</span><span>@String.Format("{0:n}₫", order.TotalPrice)</span></li>
+                            @if (order.IsCancel == false)
+                            {
+                                if (order.Status == 1)
+                                {
+                                    <li><span>Status:</span> <span class="text-primary font-weight-bold">Đợi xác nhận</span></li>
+                                }
+                                else if (order.Status == 2)
+                                {
+                                    <li><span>Status:</span> <span class="text-secondary font-weight-bold">Đang chuẩn bị hàng</span></li>
+                                }
+                                else if (order.Status == 3)
+                                {
+                                    <li><span>Status:</span> <span class="text-info font-weight-bold">Hàng đã gửi đi</span></li>
+                                }
+                                else if (order.Status == 4)
+                                {
+                                    <li><span>Status:</span> <span class="text-success font-weight-bold">Giao thành công</span></li>
+                                }
+                                <li><span class="text-danger">(Chỉ hủy đơn hàng khi chưa xác nhận)</span></li>
+                            }
+                            else
+                            {
+                                <hr />
+                                <li><span>Status:</span> <span class="text-danger font-weight-bold">Đã Hủy</span></li>
+                                <li><span>Cancel By:</span> <span class="text-secondary font-weight-bold">@order.CancelBy</span></li>
+                                <li><span>Cancel Date:</span> <span class="text-secondary font-weight-bold">@order.CancelDate</span></li>
+                                <li><span>Cancel Reason:</span> <span class="text-secondary font-weight-bold">@order.CancelReason</span></li>
+                            }
+
+                        </ul>
+                        @if (order.IsCancel == false)
+                        {
+                            if (order.Status == 1)
+                            {
+                                <div class="cart-btn mt-100">
+                                    <a href="#" id="@order.OrderID" class="btn btn-danger w-100 cancel-order-modal">Hủy</a>
+                                </div>
+                            }
+
+                        }
+
+                    </div>
+                </div>
+                index++;
+            }
+
+
+        </div>
+    </div>
+</div>
+<div class="modal" id="CancelOrderModel" role="dialog" aria-labelledby="CancelOrderModel" data-backdrop="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Lý do Hủy: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-cancel-order-reason">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+
+        $(function () {
+            // Show reason to cancel
+            $("body").on("click", ".cancel-order-modal", function (e) {
+                e.preventDefault();
+                var id = $(this).attr("id");
+                $.get("/Order/GetOrderByCancel?orderID=" + id, function (data) {
+                    $("#body-cancel-order-reason").html(data);
+                    $("#CancelOrderModel").modal('show');
+                });
+            });
+            $("body").on("click", "#cancel-order", function (e) {
+                e.preventDefault();
+                var orderID = $("#orderID").val();
+                var reason = $("#cancel-reason").val();
+                console.log(reason);
+                $.ajax({
+                    type: "POST",
+                    url: '/Cart/Cancel',
+                    data: JSON.stringify({ orderID: orderID, cancelReason: reason }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (!data.success) {
+                            toastr.error(data.message);
+                        } else {
+                            location.reload();
+                        }
+                    },
+                });
+            });
+        })
+    </script>
+}

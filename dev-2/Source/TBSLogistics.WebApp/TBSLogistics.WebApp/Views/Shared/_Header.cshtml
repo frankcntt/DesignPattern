@@ -1,0 +1,106 @@
+﻿@using TBSLogistics.WebApp.DTO
+@{
+    var cart = ((CartViewModel)Session["cart"])
+        ?? new CartViewModel(); ;
+    var cartCount = cart.CartItems.Count();
+
+
+}
+<style type="text/css">
+    .cart-fav {
+        cursor: pointer;
+        margin: 0 0 0 5px;
+        position: relative;
+        overflow: visible;
+        outline: 0;
+    }
+
+        .cart-fav .shopee-cart-number-badge {
+            top: 1.2875rem;
+            left: 0.9rem;
+            position: relative;
+            border-radius: 2.75rem;
+            width: 1.3rem;
+            line-height: 1.2em;
+            padding: 0 0.3125rem;
+            text-align: center;
+            height: 1.3rem;
+            border: 0.125rem solid #dee2e6;
+            color: #dd0a0a;
+            background-color: #dee2e6;
+            margin-right: -0.875rem;
+        }
+
+    #userDropdown {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 130px;
+    }
+</style>
+<header class="header-area clearfix">
+    <div class="nav-close">
+        <i class="fa fa-close" aria-hidden="true"></i>
+    </div>
+    <!-- Logo -->
+    <div class="logo">
+        <a href="/">
+            <img src="~/Content/img/core-img/mylogo.png" alt="">
+        </a>
+    </div>
+    <div class="cart-fav-search mb-100">
+        <a href="/"><i class="fa  fa-home" aria-hidden="true"></i><span class="p-1" style="font-size:13px !important">Trang Chủ</span></a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a href="/Order/" class="fav-nav"><i class="fa  fa-bell" aria-hidden="true"></i><span class="p-1" style="font-size:13px !important">Đơn Hàng</span></a>
+        }
+
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <a href="/Account/Login" class="fav-nav">
+                <i class="fa  fa-sign-in" aria-hidden="true"></i><span class="p-1" style="font-size:13px !important">Đăng nhập</span>
+            </a>
+            <a href="/Account/Register" class="fav-nav">
+                <i class="fa fa-registered" aria-hidden="true"></i><span class="p-1" style="font-size:13px !important">Đăng ký</span>
+            </a>
+        }
+        else
+        {
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown no-arrow">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user-circle" aria-hidden="true"></i><span class="p-1 text-lowercase" style="font-size:13px !important">@User.Identity.Name</span>
+                    </a>
+                    <!-- Dropdown - User Information -->
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                         aria-labelledby="userDropdown">
+                        <a class="fav-nav p-2 text-primary" style="font-size:13px !important" href="/Account/LogOff">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
+
+        }
+
+    </div>
+    <div class="row" id="btn-action">
+        <div class="fixed-action-btn" style="bottom: 26rem;left: 4rem;">
+            <div class="cart-fav">
+                <a href="/Cart/" class="cart-nav text-warning">
+                    <div class="shopee-cart-number-badge"><span class="text-dark" id="cart">@cartCount</span></div>
+                    <i class="fa fa-3x  fa-cart-plus" aria-hidden="true"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+    <!-- Social Button -->
+    <div class="social-info d-flex justify-content-between">
+        <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
+        <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+        <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+        <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+    </div>
+</header>

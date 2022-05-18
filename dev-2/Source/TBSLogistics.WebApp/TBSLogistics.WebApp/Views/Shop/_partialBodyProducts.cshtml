@@ -1,0 +1,52 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Models.Tbs_Product>
+
+@foreach (var item in Model)
+{
+    <div class="col-12 col-sm-6 col-md-12 col-xl-6">
+        <div class="single-product-wrapper">
+            <!-- Product Image -->
+            <div class="product-img">
+                <a href="/Product/?productID=@item.ID">
+                    <img src="@item.Image" alt="">
+                </a>
+              
+                <!-- Hover Thumb -->
+                @*<img class="hover-img" src="@item.Image" alt="">*@
+            </div>
+
+            <!-- Product Description -->
+            <div class="product-description d-flex align-items-center justify-content-between">
+                <!-- Product Meta Data -->
+                <div class="product-meta-data">
+                    <div class="line"></div>
+                    <p class="product-price" style="font-size:16px !important">@String.Format("{0:n}₫", item.Price)</p>
+                    <a href="/Product/?productID=@item.ID">
+                        <h6>@item.Name</h6>
+                    </a>
+                </div>
+                <!-- Ratings & Cart -->
+                <div class="ratings-cart text-right">
+                    <div class="ratings" style="font-size:13px !important">
+                        @if (item.Inventory == 0)
+                        {
+                            <span class="text-primary">Hết Hàng</span>
+                        }
+                        else
+                        {
+                            <span>Còn</span> <span class="font-weight-bold">@String.Format("{0:n0}", item.Inventory)</span> <span>sản phẩm</span>
+                        }
+                    </div>
+                    @if(item.Inventory != 0)
+                {
+                <div class="cart">
+                    <a href="#" class="add-cart" id="@item.ID" data-toggle="tooltip" data-placement="left" title="Add to Cart">
+                        <i class="fa fa-2x fa-cart-arrow-down" aria-hidden="true"></i>
+                    </a>
+                </div>
+                }
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+}

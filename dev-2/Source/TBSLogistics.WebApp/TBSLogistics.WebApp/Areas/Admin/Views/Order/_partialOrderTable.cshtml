@@ -1,0 +1,84 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Areas.Admin.DTO.OrderViewModel>
+
+<div class="table-responsive">
+    <table class="table table-condensed" id="dataTable" width="100%" cellspacing="0" style="font-size:14px !important">
+        <thead>
+            <tr>
+                <th style="width:25%">
+                    OrderBy
+                </th>
+                <th style="width:25%">
+                   OrderDate
+                </th>
+                <th style="width:10%">
+                    Qty
+                </th>
+                <th style="width:25%">
+                    Total
+                </th>
+                <th style="width:10%">
+                    Status
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var order in Model)
+            {
+            <tr>
+               
+                <td>
+                    @order.OrderRequestBy
+                </td>
+
+                <td>
+                    @order.OrderDate
+                </td>
+                <td>
+                    @String.Format("{0:n0}", order.TotalQty)
+                </td>
+                <td>
+                    @String.Format("{0:n0}₫", order.TotalPrice)
+                </td>
+                <td>
+
+                    @if (order.IsCancel == false)
+                    {
+                        if (order.OrderStatus == 1)
+                        {
+                            <span class="text-primary font-weight-bold">Đợi xác nhận</span>
+                        }
+                        else if (order.OrderStatus == 2)
+                        {
+                            <span class="text-secondary font-weight-bold">Đang chuẩn bị hàng</span>
+                        }
+                        else if (order.OrderStatus == 3)
+                        {
+                            <span class="text-info font-weight-bold">Hàng đã gửi đi</span>
+                        }
+                        else if (order.OrderStatus == 4)
+                        {
+                            <span class="text-success font-weight-bold">Giao thành công</span>
+                        }
+
+
+                    }
+                    else
+                    {
+                        <span class="text-danger font-weight-bold">Đã Hủy</span>
+                    }
+
+                </td>
+                <td class="text-md-center">
+                    <a href="#" class="btn btn-sm btn-success btn-rounded detail-order-modal m-1" title="Detail Category" id="@order.OrderId">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

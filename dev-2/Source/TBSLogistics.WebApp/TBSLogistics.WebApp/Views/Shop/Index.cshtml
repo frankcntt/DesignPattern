@@ -1,0 +1,90 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Models.Tbs_Category>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int cateID = (int)ViewBag.cateID;
+}
+<div class="shop_sidebar_area">
+    <!-- ##### Single Widget ##### -->
+    <div class="widget catagory mb-50">
+        <!-- Widget Title -->
+        <h6 class="widget-title mb-30">Danh Mục</h6>
+
+        <!--  Catagories  -->
+        <div class="catagories-menu">
+            <ul>
+                @foreach (var item in Model)
+                {
+                    <li><a href="#" class="cate" id="@item.ID">@item.Name</a></li>
+                }
+
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="amado_product_area section-padding-100">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="product-topbar d-xl-flex align-items-end justify-content-between">
+                    <!-- Total Products -->
+                    <div class="total-products">
+                        <div class="view d-flex">
+                            <a href="#"><i class="fa fa-th-large" aria-hidden="true"></i></a>
+                            <a href="#"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <!-- Sorting -->
+                   
+                </div>
+            </div>
+        </div>
+        <div class="row" id="body-product">
+        </div>
+    </div>
+
+</div>
+@section Scripts{
+    <!--TreeJs JS-->
+    <script type="text/javascript">
+        $(function () {
+            LoadBodyProducts(@cateID);
+            function LoadBodyProducts(id) {
+                $.ajax({
+                    type: "POST",
+                    url: '/Shop/GetProducts',
+                    data: { cateID: id },
+                    dataType: "html",
+                    async: true,
+                    cache: true,
+                    success: function (data) {
+                        $("#body-product").html(data);
+                    },
+                });
+            }
+            $("body").on("click", ".cate", function (e) {
+                e.preventDefault();
+                var Id = $(this).attr("id");
+                LoadBodyProducts(Id);
+            });
+            // Add Cart
+            $("body").on("click", ".add-cart", function (e) {
+                e.preventDefault();
+                var Id = $(this).attr("id");
+                $.ajax({
+                    type: "POST",
+                    url: '/Cart/Buy',
+                    data: JSON.stringify({ id: Id }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        toastr.success("Đã đưa vào giỏ hàng thành công!");
+                        $("#cart").text(data.cartItemCount);
+                    },
+                });
+            });
+
+        })
+    </script>
+}

@@ -1,0 +1,370 @@
+﻿@model IEnumerable<TBSLogistics.WebApp.Models.Tbs_Category>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<!--TreeJs CSS-->
+<link href="~/Areas/Admin/Statics/css/Jstree/style.min.css" rel="stylesheet" />
+<div class="row">
+
+    <div class="col-lg-3">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Tree Category</h6>
+            </div>
+            <div class="card-body">
+                <div id="jtreeCategory">
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Brand Buttons -->
+
+
+    </div>
+
+    <div class="col-lg-9">
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Table Category</h6>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title"></h4>
+                <a href="#" class="btn btn-sm btn-info btn-rounded btn-fw" data-toggle="modal" data-target="#AddCategoryModel">
+                    <i class="fa fa-puzzle-piece" aria-hidden="true"></i>
+                </a>
+                <hr />
+                <div class="card shadow mb-4">
+                    <div class="card-body" id="tbCategoryContent">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="AddCategoryModel" role="dialog" aria-labelledby="AddCategoryModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Add Category: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="Category">
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="aName"
+                               placeholder="Category Name">
+                    </div>
+                    <div class="form-group">
+                        <textarea type="text" class="form-control" id="aDesc" placeholder="Category description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="aImage">
+                            <label class="custom-file-label" for="aImage">Choose file...</label>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-primary btn-user btn-block" id="add-category">
+                        Save
+                    </a>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddSubCategoryModel" role="dialog" aria-labelledby="AddSubCategoryModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Add SubCategory: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="Category">
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="parentCategory" readonly>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control form-control-user" id="aSubName"
+                               placeholder="SubCategory Name">
+                    </div>
+                    <div class="form-group">
+                        <textarea type="text" class="form-control" id="aSubDesc" placeholder="SubCategory description"></textarea>
+                    </div>
+                    <input type="number" id="parentCategoryId" value="" hidden />
+                    <a href="#" class="btn btn-primary btn-user btn-block" id="add-subCategory">
+                        Save
+                    </a>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="UpdateCategoryModel" role="dialog" aria-labelledby="UpdateCategoryModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Update Category: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-update-category">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@Html.Partial("_ZoomImage");
+<input type="number" id="SelectCategoryID" hidden />
+@section Scripts{
+    <!--TreeJs JS-->
+    <script src="~/Areas/Admin/Statics/js/jstree.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+          
+            LoadTreeCategory();
+            function LoadTreeCategory() {
+                $.get("/Admin/Category/CategoryTree", function (data) {
+                    console.log(data);
+                    $('#jtreeCategory').jstree({
+                        'core': {
+                            'data': data
+                        },
+                        "themes": {
+                            "theme": "default",
+                            "dots": false,
+                            "icons": false
+                        },
+                    });
+                });
+                function LoadTableCategory(id) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/Admin/Category/GetCategoryTable',
+                        data: { categoryId: id },
+                        dataType: "html",
+                        async: true,
+                        cache: true,
+                        success: function (data) {
+                            $("#tbCategoryContent").html(data);
+                        },
+
+                    });
+                }
+                function ReloadCategoryTree() {
+                    $('#jtreeCategory').jstree('refresh')
+                }
+                $('#jtreeCategory').on('changed.jstree', function (e, data) {
+                    var i, j;
+                    ids = [];
+                    for (i = 0, j = data.selected.length; i < j; i++) {
+                        var id = data.selected[i];
+                        ids.push(id);
+                    }
+                    $("#SelectCategoryID").val(ids[0]);
+                    LoadTableCategory(ids[0])
+                }).bind("loaded.jstree", function (event, data) {
+                    $(this).jstree("open_all");
+                });
+
+                // Add Parent Category
+                $("body").on("click", "#add-category", function (e) {
+                    e.preventDefault();
+                    var aName = $("#aName").val();
+                    var aDesc = $("#aDesc").val();
+                    if (jQuery.trim(aName).length < 1) {
+                        toastr.error("The Name is empty.Please check again!");
+                        $("#aName").focus();
+                        return;
+                    }
+                    var fileData = new FormData();
+                    fileData.append("Name", aName);
+                    fileData.append("Description", aDesc);
+                    fileData.append("File", $('#aImage')[0].files[0]);
+                    $.ajax({
+                        url: '/Admin/Category/Add',
+                        data: fileData,
+                        type: 'POST',
+                        contentType: false,
+                        processData: false,
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                location.reload();
+                               /* LoadTableCategory($("#SelectCategoryID").val());*/
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                });
+
+                // Show model to add subcategory
+                $("body").on("click", ".add-subcategory", function (e) {
+                    e.preventDefault();
+                    var parentCategoryId = $(this).attr("id");
+                    $.get("/Admin/Category/GetCategory?id=" + parentCategoryId, function (data) {
+                        console.log(data);
+                        $("#parentCategoryId").val(data.ID);
+                        $("#parentCategory").val(data.Name);
+                        $("#AddSubCategoryModel").modal('show');
+                    });
+                });
+
+                // submit add subcategory
+                $("body").on("click", "#add-subCategory", function (e) {
+                    e.preventDefault();
+                    var parentCategoryId = $("#parentCategoryId").val();
+                    var aSubName = $("#aSubName").val();
+                    var aSubDesc = $("#aSubDesc").val();
+                    if (jQuery.trim(parentCategoryId).length < 1) {
+                        toastr.error("The system cannot get Parent Category.Please check again!");
+                        return;
+                    }
+                    if (jQuery.trim(aSubName).length < 1) {
+                        toastr.error("The Name is empty.Please check again!");
+                        $("#aSubName").focus();
+                        return;
+                    }
+                    $.ajax({
+                        url: '/Admin/Category/AddSubCategory',
+                        data: JSON.stringify({
+                            aSubName: aSubName,
+                            aSubDesc: aSubDesc,
+                            ParentID: parentCategoryId
+                        }),
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                LoadTableCategory(parentCategoryId);
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                })
+
+                // Show modal to update category
+                $("body").on("click", ".update-category", function (e) {
+                    e.preventDefault();
+                    var parentCategoryId = $(this).attr("id");
+                    $.get("/Admin/Category/GetCategoryToUpdate?id=" + parentCategoryId, function (data) {
+                        $("#body-update-category").html(data);
+                        $("#UpdateCategoryModel").modal('show');
+                        $("#uImage").on("change", function () {
+                            var fileName = $(this).val().split("\\").pop();
+                            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+                        });
+                    });
+                });
+
+                // Submit update category
+                $("body").on("click", "#update-category", function (e) {
+                    e.preventDefault();
+                    var categoryID = $("#categoryID").val();
+                    var uName = $("#uName").val();
+                    var uDesc = $("#uDesc").val();
+                    var isActive = $('#isActive').is(":checked");
+                    if (jQuery.trim(categoryID).length < 1) {
+                        toastr.error("The system cannot get Parent Category.Please check again!");
+                        return;
+                    }
+                    if (jQuery.trim(uName).length < 1) {
+                        toastr.error("The Name is empty.Please check again!");
+                        $("#uName").focus();
+                        return;
+                    }
+                    var fileData = new FormData();
+                    fileData.append("ID", categoryID);
+                    fileData.append("Name", uName);
+                    fileData.append("Description", uDesc);
+                    fileData.append("isActive", isActive);
+                    fileData.append("File", $('#uImage')[0].files[0]);
+                    $.ajax({
+                        url: '/Admin/Category/Update',
+                        data: fileData,
+                        type: 'POST',
+                        contentType: false,
+                        processData: false,
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                LoadTableCategory($("#SelectCategoryID").val());
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                })
+
+                // Delete category
+                $("body").on("click", ".delete-category", function (e) {
+                    e.preventDefault();
+                    if (confirm("Press OK to delete") == false) {
+                        return;
+                    }
+                    var categoryID = $(this).attr("id");
+                    if (jQuery.trim(categoryID).length < 1) {
+                        toastr.error("The system cannot get Parent Category.Please check again!");
+                        return;
+                    }
+                    $.ajax({
+                        url: '/Admin/Category/Delete',
+                        data: JSON.stringify({
+                            Id: categoryID
+                        }),
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        success: function (result) {
+                            if (result.success) {
+                                toastr.success(result.message);
+                                location.reload();
+                            } else {
+                                toastr.error(result.message);
+                            }
+                        },
+                        error: function (xhr, status) {
+                            toastr.error(status);
+                        }
+                    });
+                })
+
+            }
+
+        })
+    </script>
+}

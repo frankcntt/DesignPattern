@@ -1,0 +1,37 @@
+﻿@model TBSLogistics.WebApp.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+    var roles = (IEnumerable<TBSLogistics.WebApp.Models.AspNetRole>)ViewBag.Roles;
+}
+<form class="user">
+    <div class="form-group">
+        <input type="email" class="form-control form-control-user" id="uEmail" name="uEmail" placeholder="Email" value="@Model.Email" readonly>
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user" id="uPhoneNumber" name="uPhoneNumber" placeholder="uPhoneNumber" value="@Model.PhoneNumber">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user" id="uAddress" name="uAddress" placeholder="Address" value="@Model.Address">
+    </div>
+    <div class="form-group">
+        <select class="form-control form-control w-25" id="uRole">
+            <option value="" selected>--Select--</option>
+            @foreach (var item in roles)
+            {
+                if (item.Name == Model.Role)
+                {
+                    <option value="@item.Name" selected>@item.Name</option>
+                }
+                else
+                {
+                    <option value="@item.Name">@item.Name</option>
+                }
+
+            }
+        </select>
+    </div>
+    <a href="#" class="btn btn-primary btn-user btn-block" id="save-user">
+        Save
+    </a>
+</form>

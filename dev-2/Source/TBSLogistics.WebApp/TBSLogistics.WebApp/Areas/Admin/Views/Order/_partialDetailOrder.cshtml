@@ -1,0 +1,181 @@
+﻿@model TBSLogistics.WebApp.Areas.Admin.DTO.OrderDetailViewModel
+<style type="text/css">
+    .cart-summary {
+        background-color: #f5f7fa;
+        position: relative;
+        z-index: 1;
+        padding: 30px 20px;
+    }
+
+    .summary-table {
+        margin-top: 30px;
+    }
+
+        .summary-table li {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            text-transform: capitalize;
+        }
+
+            .summary-table li span {
+                color: #6b6b6b;
+                font-size: 14px;
+            }
+</style>
+<form class="user" enctype="multipart/form-data" id="Submitf" name="Submitf">
+    <div class="form-group row">
+        <div class="col-sm-4 mb-3 mb-sm-0">
+            <label class="label-primary font-weight-bold">OrderBy:</label>
+            <span>@Model.OrderRequestBy</span>
+        </div>
+        <div class="col-sm-4">
+            <label class="label-primary font-weight-bold">OrderDate:</label>
+            <span>@Model.OrderDate</span>
+        </div>
+        <div class="col-sm-4">
+            <label class="col-form-label-sm font-weight-bold">Phone:</label>
+            <span>@Model.NumberPhone</span>
+        </div>
+        <div class="col-sm-12 border-top">
+            <label class="label-primary font-weight-bold">Address:</label>
+            <span>@Model.Address</span>
+        </div>
+
+    </div>
+    <hr />
+    <div class="form-group row">
+
+        @if (Model.IsCancel == false)
+        {
+
+            if (Model.OrderStatus == 1)
+            {
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">Status: </label>
+                    <span class="text-primary font-weight-bold">Đợi xác nhận</span>
+                </div>
+            }
+            else if (Model.OrderStatus == 2)
+            {
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">Status: </label>
+                    <span class="text-secondary font-weight-bold">Đang chuẩn bị hàng</span>
+                </div>
+            }
+            else if (Model.OrderStatus == 3)
+            {
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">Status: </label>
+                    <span class="text-info font-weight-bold">Hàng đã gửi đi</span>
+                </div>
+            }
+            else if (Model.OrderStatus == 4)
+            {
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">Status: </label>
+                    <span class="text-success font-weight-bold">Giao thành công</span>
+                </div>
+            }
+            else
+            {
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">Status: </label>
+                    <span class="text-danger font-weight-bold">Đã hủy</span>
+                </div>
+
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">CancelBy: </label>
+                    <span>@Model.CancelBy</span>
+                </div>
+
+                <div class="col-sm-4">
+                    <label class="label-primary font-weight-bold">CancelDate: </label>
+                    <span>@Model.CancelDate</span>
+                </div>
+                <div class="col-sm-12">
+                    <label class="label-primary font-weight-bold">Reason: </label>
+                    <span class="text-danger font-italic">@Model.CancelReason</span>
+                </div>
+            }
+        }
+
+    </div>
+    <hr />
+    <div class="form-group row">
+        <div class="col-12 col-lg-8">
+            <table class="table table-responsive">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderProducts)
+                    {
+                        <tr>
+                            <td class="cart_product_img">
+                                <a href="#" class="pop"><img src="@item.Image" alt="Product" width="30%"></a>
+                            </td>
+                            <td class="cart_product_desc">
+                                <a href="#" class="text-primary">
+                                    <h6 class="text-primary">@item.Name</h6>
+                                </a>
+                            </td>
+                            <td class="price">
+                                <span>@String.Format("{0:n}₫", item.Price)</span>
+                            </td>
+                            <td class="qty">
+                                <span class="badge badge-info">@item.Qty</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="cart-summary">
+                <h5>Order Total</h5>
+                <ul class="summary-table text-primary">
+                    <li><span class="font-weight-bold">Total Qty:</span><span>@String.Format("{0:n0}", Model.TotalQty)</span></li>
+                    <li><span class="font-weight-bold">Total Price:</span><span>@String.Format("{0:n}₫", Model.TotalPrice)</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="form-group">
+        <div class="cart-btn mt-100">
+            @if (Model.IsCancel == false)
+            {
+                if (Model.OrderStatus == 1) // đợi hang
+                {
+                    <a href="#" class="btn btn-info w-100 m-2 excute-order" id="2">Xác nhận</a>
+                }
+                else if (Model.OrderStatus == 2)
+                {
+                    <a href="#" class="btn btn-warning w-100 m-2 excute-order" id="3">Hàng sẵn sàng</a>
+                }
+                else if (Model.OrderStatus == 3)
+                {
+                    <a href="#" class="btn btn-success w-100 m-2 excute-order" id="4">Đã gửi thành công</a>
+                }
+                if (Model.OrderStatus != 4)
+                {
+                    <a href="#" class="btn btn-danger w-100 m-2 cancel-order-modal" id="@Model.OrderId">Hủy</a>
+                }
+
+            }
+
+            <input type="number" id="orderID" value="@Model.OrderId" hidden />
+
+        </div>
+    </div>
+</form>

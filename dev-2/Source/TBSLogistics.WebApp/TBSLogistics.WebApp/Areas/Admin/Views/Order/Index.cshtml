@@ -1,0 +1,156 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">List's Order</h6>
+            </div>
+            <div class="card-body">
+                <div class="card shadow mb-4">
+                    <div class="card-body" id="tbOrderContent">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="DetailOrderModel" role="dialog" aria-labelledby="DetailOrderModel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Order Details: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-detail-order">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal" id="CancelOrderModel" role="dialog" aria-labelledby="CancelOrderModel" data-backdrop="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="exampleModalLabel">Lý do Hủy: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="body-cancel-order-reason">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@Html.Partial("_ZoomImage")
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            LoadOrders();
+            function LoadOrders() {
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/Order/LoadOrders',
+                    dataType: "html",
+                    async: true,
+                    cache: true,
+                    success: function (data) {
+                        $("#tbOrderContent").html(data);
+                    },
+
+                });
+            }
+            // Show Detail order
+            $("body").on("click", ".detail-order-modal", function (e) {
+                e.preventDefault();
+                var id = $(this).attr("id");
+                $.get("/Admin/Order/Detail?id=" + id, function (data) {
+                    $("#body-detail-order").html(data);
+                    $("#DetailOrderModel").modal('show');
+                });
+            });
+
+            // excute order
+            $("body").on("click", ".excute-order", function (e) {
+                e.preventDefault();
+                var id = $("#orderID").val();
+                var typeExcute = $(this).attr("id");
+                $.ajax({
+                    url: '/Admin/Order/ExcuteOrder',
+                    data: JSON.stringify({
+                        orderID: id,
+                        type: typeExcute
+                    }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (result) {
+                        if (result.success) {
+                            toastr.success(result.message);
+                            $.get("/Admin/Order/Detail?id=" + id, function (data) {
+                                $("#body-detail-order").html(data);
+                                $("#DetailOrderModel").modal('show');
+                            });
+                            LoadOrders();
+                        } else {
+                            toastr.error(result.message);
+                        }
+                    },
+                    error: function (xhr, status) {
+                        toastr.error(status);
+                    }
+                });
+            })
+            $("body").on("click", ".cancel-order-modal", function (e) {
+                e.preventDefault();
+                var id = $(this).attr("id");
+                $.get("Admin/Order/GetOrderByCancel?orderID=" + id, function (data) {
+                    $("#body-cancel-order-reason").html(data);
+                    $("#CancelOrderModel").modal('show');
+                });
+            });
+            // cancel order by admin
+            $("body").on("click", "#cancel-order", function (e) {
+                e.preventDefault();
+                var orderID = $("#orderID").val();
+                var reason = $("#cancel-reason").val();
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/Order/Cancel',
+                    data: JSON.stringify({ orderID: orderID, cancelReason: reason }),
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (!data.success) {
+                            toastr.error(data.message);
+                        } else {
+                            toastr.success(data.message);
+                            $.get("/Admin/Order/Detail?id=" + id, function (data) {
+                                $("#body-detail-order").html(data);
+                                $("#DetailOrderModel").modal('show');
+                            });
+                            LoadOrders();
+                        }
+                    },
+                });
+            });
+        })
+    </script>
+}
